@@ -42,14 +42,24 @@ array(
 );
 ```
 
-Apply custom default media types with respective attributes, or additional attributes to existing default types.
+~~Apply custom default media types with respective attributes, or additional attributes to existing default types.~~
 
-```php
-MediaPage::customise_defaults(array(
-	'Media Type' => array(
-		'Attribute'
-	)
-));
+Create the default type records by adding following yaml config insdie your project folder.
+
+```
+---
+Name: mediaextensions
+After:
+  - 'mediawesome/*'
+---
+MediaType:
+  default_records:
+    -
+      'Title' : 'Blog'
+    -
+      'Title' : 'News'
+    -
+      'Title' : 'Publication'
 ```
 
 These may also be added through the CMS, depending on the current user permissions.

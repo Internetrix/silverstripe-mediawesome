@@ -17,57 +17,6 @@ class MediaType extends DataObject {
 	 *	The default media types.
 	 */
 
-	private static $page_defaults = array(
-		'Blog',
-		'Event',
-		'News',
-		'Publication'
-	);
-
-	/**
-	 *	The custom default media types.
-	 */
-
-	private static $custom_defaults = array();
-
-	/**
-	 *	Apply a custom default media type with no respective attributes.
-	 *	NOTE: Refer to the module configuration example.
-	 *
-	 *	@parameter <{MEDIA_TYPE}> string
-	 */
-
-	public static function add_default($type) {
-
-		self::$custom_defaults[] = $type;
-	}
-
-	/**
-	 *	The process to automatically create any default media types, executed on project build.
-	 */
-
-	public function requireDefaultRecords() {
-
-		parent::requireDefaultRecords();
-
-		// Merge the default and custom default media types.
-
-		$defaults = array_unique(array_merge(self::$page_defaults, self::$custom_defaults));
-		foreach($defaults as $default) {
-
-			// Confirm that this media type doesn't already exist before creating it.
-
-			if(!MediaType::get_one('MediaType', array(
-				'Title = ?' => $default
-			))) {
-				$type = MediaType::create();
-				$type->Title = $default;
-				$type->write();
-				DB::alteration_message("{$default} Media Type", 'created');
-			}
-		}
-	}
-
 	/**
 	 *	Allow access for CMS users viewing media types.
 	 */
