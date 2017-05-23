@@ -99,10 +99,6 @@ class MediaPage extends Page {
 			foreach($objects as $type => $attribute) {
 				if(!isset(self::$custom_defaults[$type]) && !isset($output[$type]) && ($type !== 'MediaHolder')) {
 					$output[$type] = $attribute;
-
-					// Apply the custom default media types.
-
-					MediaType::add_default($type);
 				}
 			}
 
@@ -110,6 +106,39 @@ class MediaPage extends Page {
 
 			self::$custom_defaults = array_merge(self::$custom_defaults, $output);
 		}
+	}
+	
+	public function getRequiredDbFieldsFromTypeAttributes(){
+	    $mediaType = $this->MediaType();
+	    
+	    if( ! ($mediaType && $mediaType->Title)) return false;
+	    
+	    $temporary = array();
+	    
+	    foreach(self::$custom_defaults as $default => $attributes) {
+	        if(isset(self::$page_defaults[$default])) {
+	            self::$page_defaults[$default] = array_unique(array_merge(self::$page_defaults[$default], $attributes));
+	        }
+	        else {
+	            $temporary[$default] = $attributes;
+	        }
+	    }
+	    
+	    $defaults = array_merge(self::$page_defaults, $temporary);
+	    
+	    if($mediaType->Title && isset($defaults[$mediaType->Title]) && count($defaults[$mediaType->Title])){
+	        $dbFields = array();
+	        
+	        foreach ($defaults[$mediaType->Title] as $attributeName){
+	           if($this->relField($attributeName) !== null){
+	                $dbFields[] = $attributeName;
+	            }
+	        }
+	        
+	        return $dbFields;
+	    }
+	    
+	    return false;
 	}
 
 	/**
@@ -325,6 +354,15 @@ class MediaPage extends Page {
 				'MediaType.Title = ?' => $type,
 				'MediaAttribute.LinkID = ?' => -1
 			));
+			
+			//skip if this attribute name is defined in DB
+			if(isset($defaults[$type]) && count($defaults[$type])) {
+                		foreach($defaults[$type] as $index => $attribute) {
+					if($this->relField($attribute) !== null){
+						unset($defaults[$type][$index]);
+					}
+                		}
+			}
 
 			// Apply existing attributes to a new media page.
 
