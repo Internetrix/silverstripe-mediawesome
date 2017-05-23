@@ -99,10 +99,6 @@ class MediaPage extends Page {
 			foreach($objects as $type => $attribute) {
 				if(!isset(self::$custom_defaults[$type]) && !isset($output[$type]) && ($type !== 'MediaHolder')) {
 					$output[$type] = $attribute;
-
-					// Apply the custom default media types.
-
-					MediaType::add_default($type);
 				}
 			}
 
