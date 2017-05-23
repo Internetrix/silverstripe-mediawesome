@@ -344,6 +344,11 @@ class MediaPage extends Page {
 
 				else if(isset($defaults[$type])) {
 					foreach($defaults[$type] as $attribute) {
+						//skip if this attribute name is defined in DB
+					    	if( ! $this->hasDatabaseField($attribute)){
+					        	continue;
+					    	}
+						
 						$new = MediaAttribute::create();
 						$new->Title = $attribute;
 						$new->LinkID = -1;
